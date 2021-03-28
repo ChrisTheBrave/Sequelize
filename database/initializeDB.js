@@ -21,7 +21,6 @@ if (config.use_env_variable) {
 }
 
 const db = Object.keys(modelList).reduce((collection, modelName) => {
-
   if (!collection[modelName]) {
     // eslint-disable-next-line no-param-reassign
     collection[modelName] = modelList[modelName](sequelizeDB, DataTypes);
