@@ -24,12 +24,17 @@
 async function populateRestaurants() {
   const diningRequest = await fetch('/api/meals');
   const diningData = await diningRequest.json();
+  const macroRequest = await fetch('/api/macros');
+  const macroData = await macroRequest.json();
+
   console.log('inside populateRestaurants');
+
+
 
   diningData.forEach((mealRow) => {
     targetBox = document.querySelector('.tbl-body');
     const appendItem = document.createElement('tr');
-    console.log('inside forEach');
+    console.log('inside dining forEach');
     appendItem.classList.add('tbl-row');
     appendItem.innerHTML = `
       <td>${mealRow.meal_id}</td>
@@ -37,8 +42,26 @@ async function populateRestaurants() {
       `;
     targetBox.append(appendItem);
   });
+
+  macroData.forEach((mealRow) => {
+    targetBox = document.querySelector('.tbl-body');
+    const appendItem = document.createElement('tr');
+    console.log('inside macro forEach');
+    appendItem.classList.add('tbl-row');
+    appendItem.innerHTML = `
+      <td>${mealRow.calories}</td>
+      <td>${mealRow.carbs}</td>
+      <td>${mealRow.sodium}</td>
+      <td>${mealRow.protein}</td>
+      <td>${mealRow.fat}</td>
+      <td>${mealRow.cholesterol}</td>
+      `;
+    targetBox.append(appendItem);
+  });
+  
 }
 
+// THE FOLLOWING 3 FUNCTIONS WORK
 async function getMeals() {
   console.log('meal data request');
   const diningRequest = await fetch('/api/meals');
@@ -46,45 +69,49 @@ async function getMeals() {
   return diningData;
 }
 
-// async function getMacros() {
-//   console.log('macro data request');
-//   const macroRequest = await fetch('/api/meals');
-//   const macroData = await macroRequest.json();
-//   return macroData;
-// }
-
-async function setBasicData() {
-  localStorage.setItem('myCat', 'Tom');
+async function getMacros() {
+  console.log('macro data request');
+  const macroRequest = await fetch('/api/macros');
+  const macroData = await macroRequest.json();
+  return macroData;
 }
 
-function getBasicData() {
-  return localStorage.getItem('myCat');
+function setComplexMealData(mealData) {
+  localStorage.setItem('mealData', JSON.stringify(mealData));
 }
 
-function setComplexData(data) {
-  localStorage.setItem('data', JSON.stringify(data));
+function setComplexMacrosData(macrosData) {
+  localStorage.setItem('macrosData', JSON.stringify(macrosData));
 }
 
 async function windowActions() {
   console.log('loaded window');
+  // const leMealMacros = await getMealMacroInfo();
+  // console.table()
+
+
   const meals = await getMeals();
+  const macros = await getMacros();
   // console.table(meals);
 
-  // start unrelated exercise
-//   setBasicData();
-//   const cat = getBasicData();
-//   console.log(cat);
+  // CODE FROM SET TO POPULATE WORKS
+  setComplexMealData(meals);
+  setComplexMacrosData(macros);
 
-  setComplexData(meals);
-  const storedMeals = localStorage.getItem('data');
+  const storedMeals = localStorage.getItem('mealData');
   const storedMealData = JSON.parse(storedMeals);
-  console.log(storedMeals);
-  console.log(storedMealData);
+  // console.log('storedMeals', storedMeals);
+  console.log('storedMealData', storedMealData);
 
-  populateRestaurants(storedMealData);
+  const storedMacros = localStorage.getItem('macrosData');
+  const storedMacroData = JSON.parse(storedMacros);
+  // console.log('storedMacros', storedMacros);
+  console.log('storedMacroData', storedMacroData);
+
+  populateRestaurants([storedMealData, storedMacroData]);
+
+
 }
-
-
 
 window.onload = windowActions;
 // const tableRow = document.querySelector('.tbl-row');
