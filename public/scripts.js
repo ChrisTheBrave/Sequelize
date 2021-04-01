@@ -1,90 +1,75 @@
-// async function populateRestaurants() {
-//   const diningRequest = await fetch('/api/meals');
-//   const diningData = await diningRequest.json();
-//   console.log('inside populateRestaurants');
-
-//   diningData.data.forEach((restaurant) => {
-//     const appendItem = document.createElement('div');
-//     console.log('inside populateRestaurants');
-//     appendItem.classList.add('tile');
-//     appendItem.innerHTML = `
-//       <article class="tile is-child box has-background-link-dark">
-//       <span class="subtitle has-text-light has-text-weight-bold">
-//         ${restaurant.hall_address.split(',')[0]}
-//       </span>
-//       <br>
-//       <span>
-//         ${restaurant.hall_address.split(',')[1]}
-//       </span>
-//       </article>`;
-//     targetBox.append(appendItem);
-//   });
-// }
-
 async function populateRestaurants() {
   const diningRequest = await fetch('/api/meals');
-  const diningData = await diningRequest.json();
-  console.log('inside populateRestaurants');
+  const meals = await diningRequest.json();
+  const macroRequest = await fetch('/api/macros');
+  const macros = await macroRequest.json();
 
-  diningData.forEach((mealRow) => {
+  const mealTable = meals.map((meal) => {
+    const macrosForMeal = macros.find((macro) => macro.meal_id === meal.meal_id);
+    return {
+      id: meal.meal_id,
+      name: meal.meal_name,
+      calories: macrosForMeal.calories,
+      carbs: macrosForMeal.carbs,
+      sodium: macrosForMeal.sodium,
+      protein: macrosForMeal.protein,
+      fat: macrosForMeal.fat,
+      cholesterol: macrosForMeal.cholesterol
+    };
+  });
+
+  mealTable.forEach((meal) => {
     targetBox = document.querySelector('.tbl-body');
     const appendItem = document.createElement('tr');
-    console.log('inside forEach');
     appendItem.classList.add('tbl-row');
     appendItem.innerHTML = `
-      <td>${mealRow.meal_id}</td>
-      <td>${mealRow.meal_name}</td>
-      `;
+        <td>${meal.id}</td>
+        <td>${meal.name}</td>
+        <td>${meal.calories}</td>
+        <td>${meal.carbs}</td>
+        <td>${meal.sodium}</td>
+        <td>${meal.protein}</td>
+        <td>${meal.fat}</td>
+        <td>${meal.cholesterol}</td>
+        `;
     targetBox.append(appendItem);
   });
 }
 
 async function getMeals() {
-  console.log('meal data request');
   const diningRequest = await fetch('/api/meals');
   const diningData = await diningRequest.json();
   return diningData;
 }
 
-// async function getMacros() {
-//   console.log('macro data request');
-//   const macroRequest = await fetch('/api/meals');
-//   const macroData = await macroRequest.json();
-//   return macroData;
-// }
-
-async function setBasicData() {
-  localStorage.setItem('myCat', 'Tom');
+async function getMacros() {
+  const macroRequest = await fetch('/api/macros');
+  const macroData = await macroRequest.json();
+  return macroData;
 }
 
-function getBasicData() {
-  return localStorage.getItem('myCat');
+function setComplexMealData(mealData) {
+  localStorage.setItem('mealData', JSON.stringify(mealData));
 }
 
-function setComplexData(data) {
-  localStorage.setItem('data', JSON.stringify(data));
+function setComplexMacrosData(macrosData) {
+  localStorage.setItem('macrosData', JSON.stringify(macrosData));
 }
 
 async function windowActions() {
-  console.log('loaded window');
   const meals = await getMeals();
-  // console.table(meals);
+  const macros = await getMacros();
 
-  // start unrelated exercise
-//   setBasicData();
-//   const cat = getBasicData();
-//   console.log(cat);
+  setComplexMealData(meals);
+  setComplexMacrosData(macros);
 
-  setComplexData(meals);
-  const storedMeals = localStorage.getItem('data');
+  const storedMeals = localStorage.getItem('mealData');
   const storedMealData = JSON.parse(storedMeals);
-  console.log(storedMeals);
-  console.log(storedMealData);
 
-  populateRestaurants(storedMealData);
+  const storedMacros = localStorage.getItem('macrosData');
+  const storedMacroData = JSON.parse(storedMacros);
+
+  populateRestaurants([storedMealData, storedMacroData]);
 }
 
-
-
 window.onload = windowActions;
-// const tableRow = document.querySelector('.tbl-row');
