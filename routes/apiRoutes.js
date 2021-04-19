@@ -12,7 +12,7 @@ const router = express.Router();
 router.get('/dining', async (req, res) => {
   try {
     const halls = await db.DiningHall.findAll();
-    const reply =      halls.length > 0 ? { data: halls } : { message: 'no results found' };
+    const reply = halls.length > 0 ? { data: halls } : { message: 'no results found' };
     res.json(reply);
   } catch (err) {
     console.error(err);

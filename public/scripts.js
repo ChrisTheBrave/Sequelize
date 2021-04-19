@@ -5,7 +5,6 @@ function getRandomIntInclusive(min, max) {
 }
 
 async function getMeals() {
-  console.log('data request');
   const diningRequest = await fetch('/api/wholeMeal');
   const diningData = await diningRequest.json();
   return diningData;
