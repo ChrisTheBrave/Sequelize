@@ -1,30 +1,30 @@
-async function populateRestaurants() {
-  const diningRequest = await fetch('/api/meals');
-  const meals = await diningRequest.json();
-  const macroRequest = await fetch('/api/macros');
-  const macros = await macroRequest.json();
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min); // The maximum is inclusive and the minimum is inclusive
+}
 
-  const mealTable = meals.map((meal) => {
-    const macrosForMeal = macros.find((macro) => macro.meal_id === meal.meal_id);
-    return {
-      id: meal.meal_id,
-      name: meal.meal_name,
-      calories: macrosForMeal.calories,
-      carbs: macrosForMeal.carbs,
-      sodium: macrosForMeal.sodium,
-      protein: macrosForMeal.protein,
-      fat: macrosForMeal.fat,
-      cholesterol: macrosForMeal.cholesterol
-    };
+async function getMeals() {
+  console.log('data request');
+  const diningRequest = await fetch('/api/wholeMeal');
+  const diningData = await diningRequest.json();
+  return diningData;
+}
+async function createWholeMealTable() {
+  const results = await getMeals();
+  const meals = results.data;
+  const mealArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const selectedMeals = mealArray.map((element) => {
+    const random = getRandomIntInclusive(0, meals.length - 1);
+    return meals[random];
   });
 
-  mealTable.forEach((meal) => {
+  selectedMeals.forEach((meal) => {
     targetBox = document.querySelector('.tbl-body');
     const appendItem = document.createElement('tr');
     appendItem.classList.add('tbl-row');
     appendItem.innerHTML = `
-        <td>${meal.id}</td>
-        <td>${meal.name}</td>
+        <td>${meal.meal_name}</td>
         <td>${meal.calories}</td>
         <td>${meal.carbs}</td>
         <td>${meal.sodium}</td>
@@ -36,40 +36,96 @@ async function populateRestaurants() {
   });
 }
 
-async function getMeals() {
-  const diningRequest = await fetch('/api/meals');
-  const diningData = await diningRequest.json();
-  return diningData;
-}
+async function createWholeMealChart() {
+  const results = await getMeals();
+  const meals = results.data;
+  const mealArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const selectedMeals = mealArray.map((element) => {
+    const random = getRandomIntInclusive(0, meals.length - 1);
+    return meals[random];
+  });
 
-async function getMacros() {
-  const macroRequest = await fetch('/api/macros');
-  const macroData = await macroRequest.json();
-  return macroData;
-}
+  const calDataPoints = [];
+  const carbDataPoints = [];
+  const sodDataPoints = [];
+  const proDataPoints = [];
+  const fatDataPoints = [];
+  const cholDataPoints = [];
 
-function setComplexMealData(mealData) {
-  localStorage.setItem('mealData', JSON.stringify(mealData));
-}
+  const chart = new CanvasJS.Chart('chartContainer', {
+    animationEnabled: true,
+    title: {
+      text: 'Meal Macro Chart',
+      fontFamily: 'Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Helvetica,Arial,sans-serif'
+    },
+    toolTip: {
+      shared: true
+    },
+    legend: {
+      cursor: 'pointer',
+      itemclick: toggleDataSeries
 
-function setComplexMacrosData(macrosData) {
-  localStorage.setItem('macrosData', JSON.stringify(macrosData));
+    },
+    data: [
+      {
+        type: 'stackedBar',
+        name: 'Calories',
+        showInLegend: true,
+        dataPoints: calDataPoints
+      },
+      {
+        type: 'stackedBar',
+        name: 'Carbs',
+        showInLegend: true,
+        dataPoints: carbDataPoints
+      },
+      {
+        type: 'stackedBar',
+        name: 'Sodium',
+        showInLegend: true,
+        dataPoints: sodDataPoints
+      },
+      {
+        type: 'stackedBar',
+        name: 'Protein',
+        showInLegend: true,
+        dataPoints: proDataPoints
+      },
+      {
+        type: 'stackedBar',
+        name: 'Fat',
+        showInLegend: true,
+        dataPoints: fatDataPoints
+      }, {
+        type: 'stackedBar',
+        name: 'Cholesterol',
+        showInLegend: true,
+        dataPoints: cholDataPoints
+      }
+    ]
+  });
+  selectedMeals.forEach((meal) => {
+    calDataPoints.push({label: meal.meal_name, y: meal.calories});
+    carbDataPoints.push({label: meal.meal_name, y: meal.carbs});
+    sodDataPoints.push({label: meal.meal_name, y: meal.sodium});
+    proDataPoints.push({label: meal.meal_name, y: meal.protein});
+    fatDataPoints.push({label: meal.meal_name, y: meal.fat});
+    cholDataPoints.push({label: meal.meal_name, y: meal.cholesterol});
+  });
+  chart.render();
+  function toggleDataSeries(e) {
+    if (typeof e.dataSeries.visible === 'undefined' || e.dataSeries.visible) {
+      e.dataSeries.visible = false;
+    } else {
+      e.dataSeries.visible = true;
+    }
+    chart.render();
+  }
 }
 
 async function windowActions() {
-  const meals = await getMeals();
-  const macros = await getMacros();
-
-  setComplexMealData(meals);
-  setComplexMacrosData(macros);
-
-  const storedMeals = localStorage.getItem('mealData');
-  const storedMealData = JSON.parse(storedMeals);
-
-  const storedMacros = localStorage.getItem('macrosData');
-  const storedMacroData = JSON.parse(storedMacros);
-
-  populateRestaurants([storedMealData, storedMacroData]);
+  createWholeMealTable();
+  createWholeMealChart();
 }
 
 window.onload = windowActions;
