@@ -14,33 +14,34 @@
    crossorigin=""></script>
 </head>
 <body>
+    <h1 class="has-text-centered is-size-1">Meal Retrieval</h1>
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
     <div class='container has-text-centered'>
-        <div class="columns is-centered">
-            <div class="column is-8">
-                <div>
-                    <h1 class='title'>Meal Macro Information</h1>
-                </div>
-                <div class="table-container">
-                        <table class="table is-bordered is-striped">
-                            <thead>
-                                <tr>
-                                    <th>Meal Id</th>
-                                    <th>Name</th>
-                                    <th>Calories</th>
-                                    <th>Carbs</th>
-                                    <th>Sodium</th>
-                                    <th>Protein</th>
-                                    <th>Fat</th>
-                                    <th>Cholesterol</th>
-                                </tr>
-                            </thead>
-                            <tbody class="tbl-body"></tbody>
-                        </table>
+            <div class="columns is-centered">
+                <div class="column is-8">
+                    <div class="tbl-title">
+                        <h1 class='title'>Meal Macro Table</h1>
                     </div>
-            </div>
-        </div>    
-    </div>
+                    <div class="table-container">
+                            <table class="table is-bordered is-striped" id="meals">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Calories</th>
+                                        <th>Carbs</th>
+                                        <th>Sodium</th>
+                                        <th>Protein</th>
+                                        <th>Fat</th>
+                                        <th>Cholesterol</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="tbl-body"></tbody>
+                            </table>
+                        </div>
+                </div>
+            </div>    
+        </div>
 </body>
 <script src="scripts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.min.js" integrity="sha512-FJ2OYvUIXUqCcPf1stu+oTBlhn54W0UisZB/TNrZaVMHHhYvLBV9jMbvJYtvDe5x/WVaoXZ6KB+Uqe5hT2vlyA==" crossorigin="anonymous"></script>
 </html>
-
